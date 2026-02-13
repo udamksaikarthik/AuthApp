@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: authapp-backend 
+  profiles:
+    active: dev
+        
+server:
+  port: 8082
