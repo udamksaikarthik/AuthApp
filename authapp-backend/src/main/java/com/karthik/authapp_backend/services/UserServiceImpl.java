@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.karthik.authapp_backend.dtos.UserDto;
 import com.karthik.authapp_backend.entities.Provider;
 import com.karthik.authapp_backend.entities.User;
+import com.karthik.authapp_backend.exceptions.ResourceNotFoundException;
 import com.karthik.authapp_backend.repositories.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class UserServiceImpl implements UserService{
 		}
 		
 		if(userRepository.existsByEmail(userDto.getEmail())) {
-			throw new IllegalArgumentException("Email already exists");
+			throw new IllegalArgumentException("User with given email already exists");
 		}
 		
 		//if we need extra checks we can do them here...
@@ -47,8 +48,11 @@ public class UserServiceImpl implements UserService{
 
 	@Override
 	public UserDto getUserByEmail(String email) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		User user = userRepository
+				.findByEmail(email)
+				.orElseThrow(() -> new ResourceNotFoundException("User not found with given email"));
+		return modelMapper.map(user, UserDto.class);
 	}
 
 	@Override
