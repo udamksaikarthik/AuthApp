@@ -1,5 +1,8 @@
 package com.karthik.authapp_backend.services;
 
+import java.time.Instant;
+import java.util.UUID;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -8,6 +11,7 @@ import com.karthik.authapp_backend.dtos.UserDto;
 import com.karthik.authapp_backend.entities.Provider;
 import com.karthik.authapp_backend.entities.User;
 import com.karthik.authapp_backend.exceptions.ResourceNotFoundException;
+import com.karthik.authapp_backend.helpers.UserHelper;
 import com.karthik.authapp_backend.repositories.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -57,20 +61,34 @@ public class UserServiceImpl implements UserService{
 
 	@Override
 	public UserDto updateUser(UserDto userDto, String userId) {
-		// TODO Auto-generated method stub
-		return null;
+		UUID uid = UserHelper.parseUUID(userId);
+		User existingUser = userRepository
+				.findById(uid).orElseThrow(() -> new ResourceNotFoundException("User not found with given id."));
+		if(userDto.getName()!=null) existingUser.setName(userDto.getName());
+		existingUser.setEnabled(userDto.isEnabled());
+		if(userDto.getPassword()!=null) existingUser.setPassword(userDto.getPassword());
+		if(userDto.getProvider()!=null) existingUser.setProvider(userDto.getProvider());
+		existingUser.setUpdatedAt(Instant.now());
+		
+		User savedUser = userRepository.save(existingUser);
+		
+		return modelMapper.map(savedUser, UserDto.class);
 	}
 
 	@Override
 	public void deleteUser(String userId) {
-		// TODO Auto-generated method stub
-		
+		UUID uid = UserHelper.parseUUID(userId);
+		User user = userRepository.findById(uid)
+				.orElseThrow(() -> new ResourceNotFoundException("User not found with given ID"));
+		userRepository.delete(user);
 	}
 
 	@Override
 	public UserDto getUserById(String userId) {
-		// TODO Auto-generated method stub
-		return null;
+		UUID uid = UserHelper.parseUUID(userId);
+		User user = userRepository.findById(uid)
+				.orElseThrow(() -> new ResourceNotFoundException("User not found with given Id"));
+		return modelMapper.map(user, UserDto.class);
 	}
 
 	@Override
