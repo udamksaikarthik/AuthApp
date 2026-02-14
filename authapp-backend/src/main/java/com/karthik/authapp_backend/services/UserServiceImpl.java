@@ -14,10 +14,8 @@ import com.karthik.authapp_backend.exceptions.ResourceNotFoundException;
 import com.karthik.authapp_backend.helpers.UserHelper;
 import com.karthik.authapp_backend.repositories.UserRepository;
 
-import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor
 public class UserServiceImpl implements UserService{
 
 	@Autowired
